@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="24.11.0.0">
+<procedure name="main">
+<interface/>
+<body>
+<c>* ============================================================</c>
+<c>* HALCON Image Recognition Demo</c>
+<c>* Read an image, threshold, edge detection, blob analysis</c>
+<c>* ============================================================</c>
+
+<c>* Close all windows and turn off update</c>
+<l>dev_close_window ()</l>
+<l>dev_update_off ()</l>
+
+<c>* Step 1: Read image from computer</c>
+<l>read_image (Image, 'C:/Users/阳/Pictures/Screenshots/屏幕截图 2026-03-22 135550.png')</l>
+<l>get_image_size (Image, Width, Height)</l>
+
+<c>* Open window and display original image</c>
+<l>dev_open_window_fit_image (Image, 0, 0, -1, -1, WindowHandle)</l>
+<l>dev_set_draw ('margin')</l>
+<l>dev_set_line_width (2)</l>
+<l>dev_display (Image)</l>
+<l>disp_message (WindowHandle, 'Step 1: Original Image', 'window', 12, 12, 'black', 'true')</l>
+<l>stop ()</l>
+
+<c>* Step 2: Convert to grayscale if needed</c>
+<l>count_channels (Image, Channels)</l>
+<l>if (Channels == 3)</l>
+<l>    rgb1_to_gray (Image, GrayImage)</l>
+<l>else</l>
+<l>    GrayImage := Image</l>
+<l>endif</l>
+<l>dev_display (GrayImage)</l>
+<l>disp_message (WindowHandle, 'Step 2: Grayscale Image', 'window', 12, 12, 'black', 'true')</l>
+<l>stop ()</l>
+
+<c>* Step 3: Histogram equalization for contrast enhancement</c>
+<l>equ_histo_image (GrayImage, ImageEnhanced)</l>
+<l>dev_display (ImageEnhanced)</l>
+<l>disp_message (WindowHandle, 'Step 3: Histogram Equalization', 'window', 12, 12, 'black', 'true')</l>
+<l>stop ()</l>
+
+<c>* Step 4: Auto binary threshold to find bright regions</c>
+<l>binary_threshold (ImageEnhanced, BrightRegion, 'max_separability', 'light', UsedThreshold)</l>
+<l>dev_display (ImageEnhanced)</l>
+<l>dev_set_color ('red')</l>
+<l>dev_display (BrightRegion)</l>
+<l>disp_message (WindowHandle, 'Step 4: Binary Threshold (Threshold=' + UsedThreshold$'.2f' + ')', 'window', 12, 12, 'black', 'true')</l>
+<l>stop ()</l>
+
+<c>* Step 5: Sub-pixel edge detection (Canny)</c>
+<l>edges_sub_pix (ImageEnhanced, Edges, 'canny', 2.0, 20, 60)</l>
+<l>dev_display (ImageEnhanced)</l>
+<l>dev_set_color ('lime green')</l>
+<l>dev_display (BrightRegion)</l>
+<l>dev_set_color ('red')</l>
+<l>dev_set_line_width (1)</l>
+<l>dev_display (Edges)</l>
+<l>disp_message (WindowHandle, 'Step 5: Canny Edges + Threshold Regions', 'window', 12, 12, 'black', 'true')</l>
+<l>stop ()</l>
+
+<c>* Step 6: Connected component analysis (Blob Analysis)</c>
+<l>connection (BrightRegion, ConnectedRegions)</l>
+<l>select_shape (ConnectedRegions, SelectedRegions, 'area', 'and', 100, 999999)</l>
+<l>area_center (SelectedRegions, Area, Row, Column)</l>
+<l>count_obj (SelectedRegions, Number)</l>
+<l>dev_display (ImageEnhanced)</l>
+<l>dev_set_color ('cyan')</l>
+<l>dev_set_line_width (2)</l>
+<l>dev_display (SelectedRegions)</l>
+
+<c>* Display region index and area</c>
+<l>for i := 0 to Number - 1 by 1</l>
+<l>    disp_message (WindowHandle, 'Region ' + (i+1)$'d' + ': Area=' + Area[i]$'5d' + 'px', 'image', Row[i], Column[i], 'black', 'true')</l>
+<l>endfor</l>
+<l>disp_message (WindowHandle, 'Step 6: Blob Analysis - Found ' + Number$'d' + ' regions', 'window', 12, 12, 'black', 'true')</l>
+
+<c>* Done</c>
+<l>disp_message (WindowHandle, '==== DONE! Press F5 to re-run ====', 'window', 40, 12, 'blue', 'true')</l>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

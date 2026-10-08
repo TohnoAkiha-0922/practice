@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "solidworks": {
+      "command": "python",
+      "args": ["D:\\code.c\\Project20\\solidworks_mcp_server.py"]
+    },
+    "matlab": {
+      "command": "python",
+      "args": ["D:\\code.c\\Project20\\matlab_mcp_server.py"]
+    },
+    "zemax": {
+      "command": "D:\\zemax\\python32\\python.exe",
+      "args": ["D:\\code.c\\Project20\\zemax_mcp_server.py"],
+      "env": {
+        "ZEMAX_ROOT": "D:\\zemax\\Zemax OpticStudio"
+      }
+    },
+    "blender": {
+      "command": "python",
+      "args": ["D:\\code.c\\Project20\\blender_mcp_server.py"],
+      "env": {
+        "BLENDER_EXE": "D:\\abc\\steamapps\\common\\Blender\\blender.exe"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+[mcp_servers.matlab]
+args = ['D:\code.c\Project20\matlab_mcp_server.py']
+command = "python"
+
+[mcp_servers.solidworks]
+args = ['D:\code.c\Project20\solidworks_mcp_server.py']
+command = "python"

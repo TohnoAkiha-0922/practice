@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 热点趋势</title>
+<style>
+  /* ───────── Reset & Base ───────── */
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+    background: #0f0f13;
+    color: #e8e8ed;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ───────── Layout ───────── */
+  .container { max-width:1100px; margin:0 auto; padding:20px 24px 60px; }
+
+  /* ───────── Header ───────── */
+  .header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 0 20px; flex-wrap:wrap; gap:12px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    margin-bottom:24px;
+  }
+  .header-left { display:flex; align-items:center; gap:14px; }
+  .logo {
+    font-size:24px; font-weight:700;
+    background:linear-gradient(135deg,#667eea,#764ba2);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    white-space:nowrap;
+  }
+  .logo-sub {
+    font-size:13px; color:#888; font-weight:400;
+    background:rgba(255,255,255,.05); padding:2px 10px;
+    border-radius:12px; -webkit-text-fill-color:#888;
+  }
+  .header-actions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+
+  /* ───────── AI Filter Toggle ───────── */
+  .filter-toggle {
+    display:flex; align-items:center; gap:8px;
+    font-size:13px; color:#aaa; cursor:pointer; user-select:none;
+  }
+  .toggle-track {
+    width:40px; height:22px; background:#333; border-radius:11px;
+    position:relative; transition:background .25s; flex-shrink:0;
+  }
+  .toggle-track.active { background:#667eea; }
+  .toggle-knob {
+    width:18px; height:18px; background:#fff; border-radius:50%;
+    position:absolute; top:2px; left:2px; transition:transform .25s;
+  }
+  .toggle-track.active .toggle-knob { transform:translateX(18px); }
+
+  /* ───────── Refresh ───────── */
+  .refresh-area { display:flex; align-items:center; gap:10px; }
+  .refresh-btn {
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+    color:#ccc; padding:6px 16px; border-radius:8px; cursor:pointer;
+    font-size:13px; transition:all .2s;
+  }
+  .refresh-btn:hover { background:rgba(255,255,255,.12); color:#fff; }
+  .refresh-btn:disabled { opacity:.4; cursor:not-allowed; }
+  .refresh-btn svg { vertical-align:middle; margin-right:4px; }
+  .refresh-btn.spinning svg { animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .countdown { font-size:12px; color:#666; min-width:52px; text-align:right; }
+
+  /* ───────── Tabs ───────── */
+  .tabs {
+    display:flex; gap:4px; margin-bottom:20px;
+    background:rgba(255,255,255,.04); border-radius:10px; padding:4px;
+  }
+  .tab {
+    flex:1; padding:10px 16px; text-align:center; border:none;
+    background:transparent; color:#888; font-size:14px; font-weight:500;
+    border-radius:8px; cursor:pointer; transition:all .2s;
+  }
+  .tab:hover { color:#ccc; }
+  .tab.active {
+    background:rgba(102,126,234,.2); color:#667eea; font-weight:600;
+  }
+  .tab .badge {
+    display:inline-block; font-size:11px; font-weight:600;
+    background:rgba(255,255,255,.08); color:#999;
+    padding:0 7px; border-radius:8px; margin-left:6px;
+  }
+  .tab.active .badge { background:rgba(102,126,234,.25); color:#8899ee; }
+
+  /* ───────── Search ───────── */
+  .search-bar {
+    margin-bottom:18px; position:relative;
+  }
+  .search-bar input {
+    width:100%; padding:10px 14px 10px 38px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+    border-radius:10px; color:#e8e8ed; font-size:14px; outline:none;
+    transition:border-color .2s;
+  }
+  .search-bar input:focus { border-color:#667eea; }
+  .search-bar input::placeholder { color:#555; }
+  .search-bar .icon {
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:#555; font-size:16px;
+  }
+
+  /* ───────── Stats ───────── */
+  .stats {
+    display:flex; gap:16px; margin-bottom:18px; font-size:13px; color:#666;
+    flex-wrap:wrap;
+  }
+  .stats span { background:rgba(255,255,255,.04); padding:4px 12px; border-radius:8px; }
+
+  /* ───────── Card Grid ───────── */
+  .list { display:flex; flex-direction:column; gap:8px; }
+
+  .card {
+    display:flex; align-items:center; gap:14px;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.05);
+    border-radius:10px; padding:12px 16px;
+    transition:all .2s; cursor:pointer; position:relative;
+  }
+  .card:hover {
+    background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.1);
+    transform:translateY(-1px);
+  }
+  .card.ai-highlight {
+    background:rgba(102,126,234,.07); border-color:rgba(102,126,234,.15);
+  }
+  .card.ai-highlight:hover {
+    background:rgba(102,126,234,.12); border-color:rgba(102,126,234.25);
+  }
+
+  .card .rank {
+    width:28px; text-align:center; font-size:16px; font-weight:700;
+    color:#555; flex-shrink:0;
+  }
+  .card:nth-child(1) .rank { color:#ff4757; }
+  .card:nth-child(2) .rank { color:#ff6348; }
+  .card:nth-child(3) .rank { color:#ffa502; }
+
+  .card .content { flex:1; min-width:0; }
+  .card .title {
+    font-size:14px; font-weight:500; color:#e8e8ed;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .card .meta {
+    display:flex; align-items:center; gap:8px; margin-top:3px; font-size:12px;
+  }
+  .card .desc {
+    color:#666; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  .card .right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .card .hot {
+    font-size:12px; color:#888; font-weight:500; white-space:nowrap;
+  }
+  .card .platform-tag {
+    font-size:10px; padding:2px 7px; border-radius:6px; font-weight:600;
+    text-transform:uppercase;
+  }
+  .platform-tag.bilibili { background:rgba(0,161,214,.15); color:#00a1d6; }
+  .platform-tag.weibo    { background:rgba(255,99,71,.15); color:#ff6347; }
+  .platform-tag.douyin   { background:rgba(0,0,0,.15); color:#888; }
+
+  .card .ai-tag {
+    font-size:10px; padding:2px 7px; border-radius:6px; font-weight:600;
+    background:rgba(102,126,234,.2); color:#667eea;
+    animation:pulse-glow 2s ease-in-out infinite;
+  }
+  @keyframes pulse-glow {
+    0%,100% { box-shadow:0 0 0 0 rgba(102,126,234,0); }
+    50% { box-shadow:0 0 6px 0 rgba(102,126,234,.25); }
+  }
+
+  /* ───────── Empty / Error ───────── */
+  .empty {
+    text-align:center; padding:60px 20px; color:#555;
+  }
+  .empty svg { width:48px; height:48px; margin-bottom:12px; opacity:.4; }
+  .empty p { font-size:14px; }
+  .error-msg {
+    background:rgba(255,71,87,.1); color:#ff6b7a;
+    padding:8px 14px; border-radius:8px; font-size:13px; margin-bottom:8px;
+  }
+
+  /* ───────── Toast ───────── */
+  .toast {
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,.85); color:#e8e8ed;
+    padding:10px 20px; border-radius:10px; font-size:13px;
+    backdrop-filter:blur(8px); z-index:100;
+    opacity:0; transition:opacity .4s;
+    pointer-events:none;
+  }
+  .toast.show { opacity:1; }
+
+  /* ───────── Loading ───────── */
+  .loading-dots { display:flex; justify-content:center; gap:6px; padding:40px 0; }
+  .loading-dots span {
+    width:8px; height:8px; background:#667eea; border-radius:50%;
+    animation:bounce 1.2s ease-in-out infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay:.2s; }
+  .loading-dots span:nth-child(3) { animation-delay:.4s; }
+  @keyframes bounce {
+    0%,80%,100% { transform:scale(.6); opacity:.3; }
+    40% { transform:scale(1); opacity:1; }
+  }
+
+  /* ───────── Responsive ───────── */
+  @media (max-width:640px) {
+    .container { padding:12px 14px 40px; }
+    .header { flex-direction:column; align-items:stretch; }
+    .header-left { justify-content:center; }
+    .header-actions { justify-content:center; }
+    .tabs { flex-wrap:wrap; }
+    .tab { font-size:13px; padding:8px 10px; }
+    .card { padding:10px 12px; gap:10px; }
+    .card .title { font-size:13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">AI 热点趋势 <span class="logo-sub">B站 · 抖音 · 微博</span></div>
+    </div>
+    <div class="header-actions">
+      <label class="filter-toggle" id="aiToggle">
+        <span>AI 筛选</span>
+        <div class="toggle-track active" id="toggleTrack">
+          <div class="toggle-knob"></div>
+        </div>
+      </label>
+      <div class="refresh-area">
+        <button class="refresh-btn" id="refreshBtn" onclick="refresh()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          刷新
+        </button>
+        <span class="countdown" id="countdown"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabBar">
+    <button class="tab active" data-tab="all">综合</button>
+    <button class="tab" data-tab="bilibili">B站</button>
+    <button class="tab" data-tab="douyin">抖音</button>
+    <button class="tab" data-tab="weibo">微博</button>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <span class="icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="搜索热点..." oninput="render()">
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="stats"></div>
+
+  <!-- List -->
+  <div id="listContainer"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────── State ───────
+let rawData = null;      // { bilibili: [...], weibo: [...], douyin: [...] }
+let currentTab = "all";
+let aiOnly = true;       // default ON
+let loading = false;
+
+// ─────── Init ───────
+document.addEventListener("DOMContentLoaded", () => {
+  // Tab switching
+  document.getElementById("tabBar").addEventListener("click", e => {
+    const btn = e.target.closest(".tab");
+    if (!btn) return;
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    currentTab = btn.dataset.tab;
+    render();
+  });
+
+  // Toggle AI filter
+  document.getElementById("aiToggle").addEventListener("click", () => {
+    aiOnly = !aiOnly;
+    document.getElementById("toggleTrack").classList.toggle("active", aiOnly);
+    render();
+  });
+
+  // Keyboard shortcut: Ctrl+Enter to refresh
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") refresh();
+  });
+
+  refresh();
+  startCountdown();
+});
+
+// ─────── Fetch ───────
+async function refresh() {
+  if (loading) return;
+  loading = true;
+  const btn = document.getElementById("refreshBtn");
+  btn.classList.add("spinning");
+  btn.disabled = true;
+
+  try {
+    const url = `/api/trends${aiOnly ? "?ai_only=true" : ""}`;
+    const r = await fetch(url);
+    rawData = await r.json();
+    render();
+    showToast("✓ 已更新");
+  } catch (err) {
+    showToast("✗ 获取失败: " + err.message);
+  } finally {
+    btn.classList.remove("spinning");
+    btn.disabled = false;
+    loading = false;
+  }
+}
+
+// ─────── Render ───────
+function render() {
+  const container = document.getElementById("listContainer");
+  const statsEl = document.getElementById("stats");
+  const search = document.getElementById("searchInput").value.trim().toLowerCase();
+
+  if (!rawData) {
+    container.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
+    statsEl.innerHTML = "";
+    return;
+  }
+
+  // Flatten & filter by tab
+  let items = flattenData(rawData);
+  if (currentTab !== "all") {
+    items = items.filter(i => i.platform === currentTab);
+  }
+
+  // Search filter
+  if (search) {
+    items = items.filter(i => i.title.toLowerCase().includes(search));
+  }
+
+  // Stats
+  const total = items.length;
+  const aiCount = items.filter(i => i.ai).length;
+  const platCounts = {};
+  items.forEach(i => { platCounts[i.platform] = (platCounts[i.platform] || 0) + 1; });
+  statsEl.innerHTML = `<span>共 ${total} 条</span>` +
+    (aiOnly ? `<span>🤖 AI 相关 ${aiCount} 条</span>` : "") +
+    Object.entries(platCounts).map(([k,v]) =>
+      `<span>${platformLabel(k)} ${v}</span>`
+    ).join("");
+
+  // Empty state
+  if (!items.length) {
+    container.innerHTML = `<div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p>没有匹配结果</p>
+    </div>`;
+    return;
+  }
+
+  // Build cards
+  let html = '<div class="list">';
+  items.forEach((item, idx) => {
+    const isAI = item.ai;
+    const cardClass = isAI ? "card ai-highlight" : "card";
+    const platTag = `<span class="platform-tag ${item.platform}">${platformLabel(item.platform)}</span>`;
+    const aiTag = isAI ? '<span class="ai-tag">AI</span>' : "";
+    const rank = item.rank || idx + 1;
+    const url = item.url || "#";
+
+    // Error item?
+    if (item.error) {
+      html += `<div class="error-msg">⚠ ${platformLabel(item.platform)}: ${item.error}</div>`;
+      return;
+    }
+
+    html += `
+      <a class="${cardClass}" href="${url}" target="_blank" rel="noopener">
+        <div class="rank">${rank}</div>
+        <div class="content">
+          <div class="title">${escapeHtml(item.title)}</div>
+          <div class="meta">
+            ${platTag} ${item.desc ? `<span class="desc">${escapeHtml(item.desc)}</span>` : ""}
+          </div>
+        </div>
+        <div class="right">
+          ${item.hot_value ? `<span class="hot">🔥 ${item.hot_value}</span>` : ""}
+          ${aiTag}
+        </div>
+      </a>
+    `;
+  });
+  html += "</div>";
+  container.innerHTML = html;
+}
+
+// ─────── Helpers ───────
+function flattenData(data) {
+  const all = [];
+  for (const [platform, items] of Object.entries(data)) {
+    if (Array.isArray(items)) {
+      items.forEach(item => {
+        if (!item.error) all.push({ ...item, platform });
+      });
+    }
+  }
+  // Deduplicate by title
+  const seen = new Set();
+  return all.filter(item => {
+    if (seen.has(item.title)) return false;
+    seen.add(item.title);
+    return true;
+  });
+}
+
+function platformLabel(p) {
+  return { bilibili: "B站", weibo: "微博", douyin: "抖音" }[p] || p;
+}
+
+function escapeHtml(s) {
+  if (!s) return "";
+  const div = document.createElement("div");
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._hide);
+  t._hide = setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+// ─────── Auto-refresh countdown ───────
+let countdown = 0;
+const INTERVAL = 60; // seconds
+
+function startCountdown() {
+  countdown = INTERVAL;
+  document.getElementById("countdown").textContent = `${countdown}s`;
+  setInterval(() => {
+    countdown--;
+    if (countdown <= 0) {
+      countdown = INTERVAL;
+      refresh();
+    }
+    document.getElementById("countdown").textContent = `${countdown}s`;
+  }, 1000);
+}
+</script>
+</body>
+</html>
